@@ -1,6 +1,7 @@
 from sqlalchemy import func
 from DB.models import Message
 from app import db
+from DB.db_errors import *
 
 class messageHandler():
     def createMessageDB(message_data):
@@ -23,26 +24,25 @@ class messageHandler():
         next_id = (max_id or 0) + 1
         return next_id
 
+    
     def getMessageDB(message_id):
         message_to_return = Message.query.filter_by(id=message_id).first()
         if message_to_return:
             return message_to_return
         else:
-            return "message not found"
-    
-
+            return ERROR_MESSAGE_NOT_FOUND
+        
     def updateMessageDB(message_data, message_id):
         message_to_update = Message.query.filter_by(id=message_id).first()
-        if message_to_update:
-            message_to_update.user_id = message_data['user_id']
-            message_to_update.repeat = message_data['repeat']
-            message_to_update.dest_groups_id = message_data['dest_groups_id']
-            message_to_update.message_data = message_data['message_data']
-            message_to_update.message_title = message_data['message_title']
+        for key, value in message_data.items():
+        # Check if the attribute exists in the Message model before updating
+            if hasattr(message_to_update, key):
+                setattr(message_to_update, key, value)
+                
             db.session.commit()
             return message_to_update
         else:
-            return "message not found"
+            return ERROR_MESSAGE_NOT_FOUND
     
 
     def deleteMessageDB(message_id):
@@ -52,4 +52,4 @@ class messageHandler():
             db.session.commit()
             return message_to_delete
         else:
-            return "message not found"
+            return ERROR_MESSAGE_NOT_FOUND
