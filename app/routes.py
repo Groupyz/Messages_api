@@ -3,8 +3,9 @@ from DB.db_handler import messageHandler
 from app import app
 from DB.db_errors import *
 
+MESSAGE_PATH = "message"
 
-@app.route("/message", methods=['POST'])
+@app.route(f'/{MESSAGE_PATH}', methods=['POST'])
 def createMessage():
     try:
         message_data = request.get_json()
@@ -15,7 +16,7 @@ def createMessage():
         return make_response(jsonify({'error': error_message}), 500)
 
 
-@app.route("/message/<id>", methods=['GET', 'PUT', 'DELETE'])
+@app.route(f'/{MESSAGE_PATH}/<id>', methods=['GET', 'PUT', 'DELETE'])
 def handleMessage(id):
     if request.method == 'GET':
         return handleData.handle_get(id)
@@ -33,10 +34,10 @@ class handleData():
     def handle_get(id):
         try:
             message_to_return = messageHandler.getMessageDB(id)
-            if message_to_return != "message not found":
+            if message_to_return != ERROR_MESSAGE_NOT_FOUND:
                 return make_response(jsonify({'message': message_to_return.json()}), 200)
             else:
-                return make_response(jsonify({'error': 'Message not found'}), 404)
+                return make_response(jsonify({'error': ERROR_MESSAGE_NOT_FOUND}), 404)
         except Exception as e:
             error_message = DbErrors.handle_error(e)
             return make_response(jsonify({'error': error_message}), 500)
@@ -45,10 +46,10 @@ class handleData():
         try:
             message_data = request.get_json()
             updated_message = messageHandler.updateMessageDB(message_data, id)
-            if updated_message != "message not found":
+            if updated_message != ERROR_MESSAGE_NOT_FOUND:
                 return make_response(jsonify({'message updated': updated_message.json()}), 200)
             else:
-                return make_response(jsonify({'error': 'Message not found'}), 404)
+                return make_response(jsonify({'error': ERROR_MESSAGE_NOT_FOUND}), 404)
         except Exception as e:
             error_message = DbErrors.handle_error(e)
             return make_response(jsonify({'error': error_message}), 500)
@@ -56,10 +57,10 @@ class handleData():
     def handle_delete(id):
         try:
             deleted_message = messageHandler.deleteMessageDB(id)
-            if deleted_message != "message not found":
+            if deleted_message != ERROR_MESSAGE_NOT_FOUND:
                 return make_response(jsonify({'message deleted': deleted_message.json()}), 204)
             else:
-                return make_response(jsonify({'error': 'Message not found'}), 404)
+                return make_response(jsonify({'error': ERROR_MESSAGE_NOT_FOUND}), 404)
         except Exception as e:
             error_message = DbErrors.handle_error(e)
             return make_response(jsonify({'error': error_message}), 500)
