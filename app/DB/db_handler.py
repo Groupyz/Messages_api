@@ -2,10 +2,12 @@ from sqlalchemy import func
 from DB.models import Message
 from app import db
 from DB.db_errors import *
+from datetime import datetime, timedelta
 
 
 class messageHandler:
     def createMessageDB(msg_data):
+        msg_data["time_to_send"] = messageHandler.adjustTiming(msg_data["time_to_send"])
         new_message = Message(
             id=messageHandler.generateId(),
             user_id=msg_data["user_id"],
@@ -60,3 +62,9 @@ class messageHandler:
             return message_to_delete
         else:
             return ERROR_MESSAGE_NOT_FOUND
+        
+    @staticmethod
+    def adjustTiming(time_to_send):
+        dt_time = datetime.strptime(time_to_send, '%Y-%m-%d %H:%M:%S')
+        new_time = dt_time - timedelta(hours=3)
+        return new_time.strftime('%Y-%m-%d %H:%M:%S')
