@@ -33,6 +33,13 @@ class messageHandler:
         else:
             return ERROR_MESSAGE_NOT_FOUND
 
+    def getAllMessagesDB(user_id):
+        messages_to_return = Message.query.filter_by(user_id=user_id).all()
+        if messages_to_return:
+            return messages_to_return
+        else:
+            return ERROR_MESSAGE_NOT_FOUND
+    
     def updateMessageDB(message_data, message_id):
         message_to_update = Message.query.filter_by(id=message_id).first()
         for key, value in message_data.items():
